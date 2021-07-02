@@ -48,9 +48,33 @@ const mostBlogs = (blogs) => {
 	return returnObj
 }
 
+const mostLikes = (blogs) => {
+	const obj = {}
+	blogs.forEach((blog) => {
+		if (obj[blog.author] === undefined) obj[blog.author] = blog.likes
+		else obj[blog.author] += blog.likes
+	})
+	const authors = Object.keys(obj)
+	const likes = Object.values(obj)
+	let max = 0,
+		pos = 0
+	for (let i = 0; i < likes.length; i++) {
+		if (likes[i] > max) {
+			max = likes[i]
+			pos = i
+		}
+	}
+	const returnObj = {
+		author: authors[pos],
+		likes: likes[pos],
+	}
+	return returnObj
+}
+
 module.exports = {
 	dummy,
 	totalLikes,
 	favoriteBlog,
 	mostBlogs,
+	mostLikes,
 }
