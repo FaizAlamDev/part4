@@ -23,8 +23,34 @@ const favoriteBlog = (blogs) => {
 	}
 }
 
+const mostBlogs = (blogs) => {
+	const authors = blogs.map((blog) => blog.author)
+	const obj = {} // object which has the authors name with its frequency
+	authors.forEach((author) => {
+		if (obj[author] === undefined) obj[author] = 1
+		else obj[author] += 1
+	})
+
+	let max = 0,
+		pos = 0
+	let keys = Object.keys(obj)
+	let values = Object.values(obj)
+	for (let i = 0; i < values.length; i++) {
+		if (values[i] > max) {
+			max = values[i]
+			pos = i
+		}
+	}
+	const returnObj = {
+		author: keys[pos],
+		blogs: values[pos],
+	}
+	return returnObj
+}
+
 module.exports = {
 	dummy,
 	totalLikes,
 	favoriteBlog,
+	mostBlogs,
 }
