@@ -28,6 +28,7 @@ beforeEach(async () => {
 	}
 })
 
+// exercise 4.8
 test('blogs are returned as json', async () => {
 	await api
 		.get('/api/blogs')
@@ -39,6 +40,13 @@ test('correct amount of blogs are returned', async () => {
 	const res = await api.get('/api/blogs')
 
 	expect(res.body).toHaveLength(2)
+})
+
+// exercise 4.9
+test('unique identifier property is named id', async () => {
+	const res = await api.get('/api/blogs')
+
+	expect(res.body[0].id).toBeDefined()
 })
 
 afterAll(() => {
