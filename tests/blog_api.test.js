@@ -90,6 +90,18 @@ test('if title and url are missing, respond with 400 status code', async () => {
 		.expect('Content-Type', /application\/json/)
 })
 
+// exercise 4.13
+test('deleting a note with valid id', async () => {
+	const blogsAtStart = await helper.blogsInDb()
+	const blogToDelete = blogsAtStart[0]
+
+	await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+
+	const blogsAtEnd = await helper.blogsInDb()
+
+	expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1)
+})
+
 afterAll(() => {
 	mongoose.connection.close()
 })
