@@ -76,6 +76,20 @@ test('if likes are missing, default it to 0', async () => {
 	expect(blog.likes).toBe(0)
 })
 
+// exercise 4.12
+test('if title and url are missing, respond with 400 status code', async () => {
+	const newBlog = {
+		author: 'Edsger W. Dijkstra',
+		likes: 12,
+	}
+
+	await api
+		.post('/api/blogs')
+		.send(newBlog)
+		.expect(400)
+		.expect('Content-Type', /application\/json/)
+})
+
 afterAll(() => {
 	mongoose.connection.close()
 })
