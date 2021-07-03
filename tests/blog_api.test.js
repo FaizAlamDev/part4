@@ -49,6 +49,26 @@ test('unique identifier property is named id', async () => {
 	expect(res.body[0].id).toBeDefined()
 })
 
+// exercise 4.10
+test('POST request creates a new blog post', async () => {
+	const newBlog = {
+		title: 'Canonical string reduction',
+		author: 'Edsger W. Dijkstra',
+		url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
+		likes: 12,
+	}
+	await api
+		.post('/api/blogs')
+		.send(newBlog)
+		.expect(201)
+		.expect('Content-Type', /application\/json/)
+
+	const res = await api.get('/api/blogs')
+	const titles = res.body.map((t) => t.title)
+	expect(res.body).toHaveLength(initialBlogs.length + 1)
+	expect(titles).toContain('Canonical string reduction')
+})
+
 afterAll(() => {
 	mongoose.connection.close()
 })
