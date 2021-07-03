@@ -102,6 +102,23 @@ test('deleting a note with valid id', async () => {
 	expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1)
 })
 
+// exercise 4.14
+test('updating the blog', async () => {
+	const blogsAtStart = await helper.blogsInDb()
+	const blogToUpdate = blogsAtStart[0]
+
+	const blog = {
+		likes: 77,
+	}
+
+	await api.put(`/api/blogs/${blogToUpdate.id}`).send(blog).expect(200)
+
+	const blogsAtEnd = await helper.blogsInDb()
+
+	expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+	expect(blogsAtEnd[0].likes).toBe(blog.likes)
+})
+
 afterAll(() => {
 	mongoose.connection.close()
 })
