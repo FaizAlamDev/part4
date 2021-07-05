@@ -20,8 +20,7 @@ beforeEach(async () => {
 	}
 })
 
-describe('blog tests', () => {
-	// exercise 4.8
+describe('when there a 2 blogs in DB', () => {
 	test('blogs are returned as json', async () => {
 		await api
 			.get('/api/blogs')
@@ -35,14 +34,29 @@ describe('blog tests', () => {
 		expect(res.body).toHaveLength(2)
 	})
 
-	// exercise 4.9
 	test('unique identifier property is named id', async () => {
 		const res = await api.get('/api/blogs')
 
 		expect(res.body[0].id).toBeDefined()
 	})
+})
 
-	// exercise 4.10
+describe('adding blogs', () => {
+	let headers
+	beforeEach(async () => {
+		const newUser = {
+			username: 'faizalam',
+			name: 'Faiz Alam',
+			password: 'alam',
+		}
+		await api.post('/api/users').send(newUser)
+
+		const result = await api.post('/api/login').send(newUser)
+		headers = {
+			Authorization: `bearer ${result.body.token}`,
+		}
+	})
+
 	test('POST request creates a new blog post', async () => {
 		const newBlog = {
 			title: 'Canonical string reduction',
@@ -53,6 +67,7 @@ describe('blog tests', () => {
 		await api
 			.post('/api/blogs')
 			.send(newBlog)
+			.set(headers)
 			.expect(201)
 			.expect('Content-Type', /application\/json/)
 
@@ -62,7 +77,6 @@ describe('blog tests', () => {
 		expect(titles).toContain('Canonical string reduction')
 	})
 
-	// exercise 4.11
 	test('if likes are missing, default it to 0', async () => {
 		const newBlog = {
 			title: 'Canonical string reduction',
@@ -73,6 +87,7 @@ describe('blog tests', () => {
 		await api
 			.post('/api/blogs')
 			.send(newBlog)
+			.set(headers)
 			.expect(201)
 			.expect('Content-Type', /application\/json/)
 
@@ -83,7 +98,6 @@ describe('blog tests', () => {
 		expect(blog.likes).toBe(0)
 	})
 
-	// exercise 4.12
 	test('if title and url are missing, respond with 400 status code', async () => {
 		const newBlog = {
 			author: 'Edsger W. Dijkstra',
@@ -93,23 +107,11 @@ describe('blog tests', () => {
 		await api
 			.post('/api/blogs')
 			.send(newBlog)
+			.set(headers)
 			.expect(400)
 			.expect('Content-Type', /application\/json/)
 	})
 
-	// exercise 4.13
-	test('deleting a note with valid id', async () => {
-		const blogsAtStart = await helper.blogsInDb()
-		const blogToDelete = blogsAtStart[0]
-
-		await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
-
-		const blogsAtEnd = await helper.blogsInDb()
-
-		expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1)
-	})
-
-	// exercise 4.14
 	test('updating the blog', async () => {
 		const blogsAtStart = await helper.blogsInDb()
 		const blogToUpdate = blogsAtStart[0]
@@ -125,10 +127,30 @@ describe('blog tests', () => {
 		expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
 		expect(blogsAtEnd[0].likes).toBe(blog.likes)
 	})
+
+	test('POST request fails if token is not provided', async () => {
+		const newBlog = {
+			title: 'Token',
+			author: 'Faiz',
+			url: 'http://localhost:3001/api/blogs/3',
+			likes: 40,
+		}
+
+		const blogsAtStart = await helper.blogsInDb()
+
+		await api
+			.post('/api/blogs')
+			.send(newBlog)
+			.expect(401)
+			.expect('Content-Type', /application\/json/)
+
+		const blogsAtEnd = await helper.blogsInDb()
+
+		expect(blogsAtEnd.length).toBe(blogsAtStart.length)
+	})
 })
 
-describe('user tests', () => {
-	// exercise 4.16
+describe('adding users', () => {
 	test('duplicate username gives an error', async () => {
 		const newUser = {
 			username: 'robertdeniro',

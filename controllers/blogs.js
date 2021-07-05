@@ -13,6 +13,10 @@ blogsRouter.post('/', async (request, response) => {
 
 	const user = request.user
 
+	if (!user) {
+		return response.status(401).json({ error: 'token missing' })
+	}
+
 	if (!body.title || !body.url) {
 		return response.status(400).json({ error: 'title or url missing' })
 	}
